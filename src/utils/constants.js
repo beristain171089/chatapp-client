@@ -12,7 +12,10 @@ export const ENV = {
             REFRESH_ACCESS_TOKEN: 'auth/refresh_access_token'
         },
         ME: 'user/me',
-        USER: 'user'
+        USER: 'user',
+        CHAT: 'chat',
+        CHAT_MESSAGE_LAST: 'chat/message/last',
+        CHAT_MESSAGE_TOTAL: 'chat/message/total'
     },
     JWT: {
         ACCESS: 'access',

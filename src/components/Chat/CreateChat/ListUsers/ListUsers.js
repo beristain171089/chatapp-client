@@ -2,15 +2,33 @@ import { ScrollView, View, Text, TouchableOpacity } from 'react-native';
 import { Avatar } from 'native-base';
 import { useNavigation } from '@react-navigation/native';
 import { map } from 'lodash';
+import { Chat } from '../../../../api';
+import { useAuth } from '../../../../hooks';
 import { ENV } from '../../../../utils';
 import { styles } from './ListUsers.styles.js';
+
+const chatController = new Chat();
 
 export function ListUser(props) {
 
     const { users } = props;
 
-    const createChat = (user) => {
-        console.log('crear chat con ', user.email);
+    const auth = useAuth();
+
+    const navigation = useNavigation();
+
+    const createChat = async (user) => {
+
+        try {
+
+            await chatController.create(auth.accessToken, auth.user._id, user._id)
+
+            navigation.goBack();
+
+        } catch (error) {
+            console.log(error);
+        };
+
     };
 
     return (
