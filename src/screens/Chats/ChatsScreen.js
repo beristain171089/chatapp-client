@@ -6,7 +6,7 @@ import { size } from 'lodash';
 import { Chat } from '../../api';
 import { useAuth } from '../../hooks';
 import { LoadingScreen } from '../../components/Shared';
-import { ListChat } from '../../components/Chat';
+import { ListChat, Search } from '../../components/Chat';
 import { screens } from '../../utils';
 
 const chatCrontroller = new Chat();
@@ -19,6 +19,9 @@ export function ChatsScreen() {
 
     const [chats, setChats] = useState(null);
     const [chatsResult, setChatsResult] = useState(null);
+    const [reload, setReload] = useState(false);
+
+    const onReload = () => setReload((prevState) => !prevState);
 
     useEffect(() => {
 
@@ -43,8 +46,17 @@ export function ChatsScreen() {
                 try {
 
                     const response = await chatCrontroller.getAll(accessToken);
-                    setChats(response);
-                    setChatsResult(response);
+
+                    const result = response.sort((a, b) => {
+
+                        return (
+                            new Date(b.last_message_date) - new Date(a.last_message_date)
+                        );
+
+                    });
+
+                    setChats(result);
+                    setChatsResult(result);
 
                 } catch (error) {
                     console.log(error);
@@ -52,15 +64,38 @@ export function ChatsScreen() {
 
             })();
 
-        }, [])
+        }, [reload])
     );
+
+    const upToChat = (chatId) => {
+
+        const data = chatsResult;
+
+        const formIndex = data.map((chat) => chat._id).indexOf(chatId);
+
+        const toIndex = 0;
+
+        const element = data.splice(formIndex, 1)[0];
+
+        data.splice(toIndex, 0, element);
+
+        setChats([...data]);
+    }
 
     if (!chatsResult) return <LoadingScreen />;
 
     return (
         <View>
+            {size(chats) > 0 &&
+                <Search
+                    data={chats}
+                    setData={setChatsResult}
+                />
+            }
             <ListChat
                 chats={size(chats) === size(chatsResult) ? chats : chatsResult}
+                onReload={onReload}
+                upToChat={upToChat}
             />
         </View>
     );

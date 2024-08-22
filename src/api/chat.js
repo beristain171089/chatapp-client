@@ -62,4 +62,33 @@ export class Chat {
 
     };
 
+    async remove(token, chatId) {
+
+        try {
+
+            const url = `${ENV.API_URL}/${ENV.ENDPOINTS.CHAT}/${chatId}`;
+
+            const params = {
+                method: 'delete',
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            };
+
+            const response = await fetch(url, params);
+
+            const result = await response.json();
+
+            if (response.status !== 200 && response.status !== 201) {
+                throw result;
+            };
+
+            return result;
+
+        } catch (error) {
+            throw error;
+        };
+
+    };
+
 };

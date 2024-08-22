@@ -3,7 +3,17 @@ import { Input } from 'native-base';
 import { createFilter } from 'react-search-input';
 import { styles } from './Search.styles.js';
 
-const KEYS_TO_FILTERS = ['email', 'firstname', 'lastname'];
+const KEYS_TO_FILTERS = [
+    'email',
+    'firstname',
+    'lastname',
+    'participant_one.email',
+    'participant_one.firstname',
+    'participant_one.lastname',
+    'participant_two.email',
+    'participant_two.firstname',
+    'participant_two.lastname'
+];
 
 export function Search(props) {
 

@@ -1,27 +1,32 @@
 import { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Avatar } from 'native-base';
 import { isEmpty } from 'lodash';
 import { DateTime } from 'luxon';
-import { ChatMessage, UnreadMessages } from '../../../../api';
+import { Chat, ChatMessage, UnreadMessages } from '../../../../api';
 import { useAuth } from '../../../../hooks';
-import { ENV } from '../../../../utils';
+import { ENV, socket, screens } from '../../../../utils';
+import { AlertConfirm } from '../../../../components/Shared';
 import { styles } from './item.styles.js';
 
+const chatController = new Chat();
 const chatMessageController = new ChatMessage();
 const unreadMessagesController = new UnreadMessages();
 
 export function Item(props) {
 
-    const { chat } = props;
+    const { chat, onReload, upToChat } = props;
 
     const { participant_one, participant_two } = chat;
 
     const { accessToken, user } = useAuth();
+    const navigation = useNavigation();
 
     const [lastMessage, setLastMessage] = useState(null);
     const [totalUnreadMessages, setTotalUnreadMessages] = useState(0);
+    const [showDelete, setShowDelete] = useState(false);
 
     useEffect(() => {
 
@@ -61,10 +66,58 @@ export function Item(props) {
 
     }, [chat._id]);
 
+    useEffect(() => {
+
+        socket.emit('subscribe', `${chat._id}_notify`)
+        socket.on('message_notify', newMessage);
+
+    }, []);
+
+    const newMessage = async (newMessage) => {
+
+        if (newMessage.chat === chat._id) {
+
+            if (newMessage.user._id !== user._id) {
+
+                upToChat(newMessage.chat);
+
+                setLastMessage(newMessage);
+
+                const activeChatId = await AsyncStorage.getItem(ENV.ACTIVE_CHAT_ID);
+
+                if (activeChatId !== newMessage.chat) {
+                    setTotalUnreadMessages((prevState) => prevState + 1);
+                };
+
+            };
+
+        };
+
+    };
+
     const userChat = user._id === participant_one._id ? participant_two : participant_one;
 
+    const openCloseDelete = () => setShowDelete(prevState => !prevState);
+
     const openChat = () => {
-        console.log('Abrir chat -->', chat._id);
+        setTotalUnreadMessages(0);
+        navigation.navigate(screens.global.chatScreen, { chatId: chat._id });
+    };
+
+    const deleteChat = async () => {
+
+        try {
+
+            await chatController.remove(accessToken, chat._id);
+
+            openCloseDelete();
+
+            onReload();
+
+        } catch (error) {
+            console.error(error);
+        };
+
     };
 
     return (
@@ -72,6 +125,7 @@ export function Item(props) {
             <TouchableOpacity
                 style={styles.content}
                 onPress={openChat}
+                onLongPress={openCloseDelete}
             >
                 <Avatar
                     bg='cyan.500'
@@ -118,6 +172,15 @@ export function Item(props) {
                     </View>
                 </View>
             </TouchableOpacity>
+            <AlertConfirm
+                show={showDelete}
+                onClose={openCloseDelete}
+                textConfirm='Eliminar'
+                onConfirm={deleteChat}
+                title='Eliminar chat'
+                message={`Estas seguro de que quieres eliminar el chat con ${userChat.email}`}
+                isDanger
+            />
         </>
     );
 };

@@ -5,7 +5,7 @@ import { styles } from './ListChat.styles.js';
 
 export function ListChat(props) {
 
-    const { chats } = props;
+    const { chats, onReload, upToChat } = props;
 
     return (
         <ScrollView alwaysBounceVertical={false}>
@@ -21,6 +21,8 @@ export function ListChat(props) {
                     <Item
                         key={chat._id}
                         chat={chat}
+                        onReload={onReload}
+                        upToChat={upToChat}
                     />
                 ))}
             </View>

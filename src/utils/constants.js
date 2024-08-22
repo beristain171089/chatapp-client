@@ -20,5 +20,6 @@ export const ENV = {
     JWT: {
         ACCESS: 'access',
         REFRESH: 'refresh'
-    }
+    },
+    ACTIVE_CHAT_ID: "active_chat_id"
 };
