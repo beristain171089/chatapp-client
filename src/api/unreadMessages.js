@@ -3,10 +3,16 @@ import { ENV } from '../utils';
 
 export class UnreadMessages {
 
-    async getTotalReadMessages(chat_id) {
+    async getTotalReadMessages(chatId) {
 
-        const response = await AsyncStorage.getItem(`${chat_id}_read`);
+        const response = await AsyncStorage.getItem(`${chatId}_read`);
         return Number(response);
+
+    };
+
+    async setTotalReadMessages(chatId, total) {
+
+        const response = await AsyncStorage.setItem(`${chatId}_read`, JSON.stringify(total));
 
     };
 
