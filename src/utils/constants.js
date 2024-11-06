@@ -15,6 +15,7 @@ export const ENV = {
         USER: 'user',
         CHAT: 'chat',
         CHAT_MESSAGE: 'chat/message',
+        CHAT_MESSAGE_IMAGE: 'chat/message/image',
         CHAT_MESSAGE_LAST: 'chat/message/last',
         CHAT_MESSAGE_TOTAL: 'chat/message/total'
     },

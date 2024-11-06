@@ -20,12 +20,16 @@ export function ItemImage(props) {
 
     const navigation = useNavigation();
 
-    const imageUrl = `${ENV.BASE_PATH}/${message.message}`
+    const imageUrl = `${ENV.BASE_PATH}/${message.message}`;
+
+    const onOpenImage = () => {
+        navigation.navigate(screens.global.imageFullScreen, { uri: imageUrl });
+    };
 
     return (
         <View style={styles.content}>
             <View style={styles.message}>
-                <Pressable onPress={() => { }}>
+                <Pressable onPress={onOpenImage}>
                     <AutoHeightImage
                         width={300}
                         maxHeight={400}

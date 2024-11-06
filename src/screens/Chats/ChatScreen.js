@@ -7,8 +7,8 @@ import { ChatMessage, UnreadMessages } from '../../api';
 import { useAuth } from '../../hooks';
 import { HeaderChat } from '../../components/Navigation';
 import { LoadingScreen } from '../../components/Shared';
-import { ListMessages } from '../../components/Chat';
-import { ENV } from '../../utils';
+import { ListMessages, ChatForm } from '../../components/Chat';
+import { ENV, socket } from '../../utils';
 
 const chatMessageController = new ChatMessage();
 const unreadMessagesController = new UnreadMessages();
@@ -45,6 +45,7 @@ export function ChatScreen() {
                 const response = await chatMessageController.getAll(accessToken, chatId);
 
                 setMessages(response.messages);
+                return;
 
                 unreadMessagesController.setTotalReadMessages(chatId, response.total);
 
@@ -54,14 +55,30 @@ export function ChatScreen() {
 
         })();
 
-        return async () => {
-
-            const response = await chatMessageController.getAll(accessToken, chatId);
-
-            unreadMessagesController.setTotalReadMessages(chatId, response.total);
-        };
+        /*  return async () => {
+ 
+             const response = await chatMessageController.getAll(accessToken, chatId);
+ 
+             unreadMessagesController.setTotalReadMessages(chatId, response.total);
+         }; */
 
     }, [chatId]);
+
+    useEffect(() => {
+
+        socket.emit('subscribe', chatId);
+        socket.on('message', newMesage);
+
+        return () => {
+            socket.emit('unsubscribe', chatId);
+            socket.off('message', newMesage);
+        };
+
+    }, [chatId, messages]);
+
+    const newMesage = (msg) => {
+        setMessages([...messages, msg]);
+    };
 
     return (
         <>
@@ -69,10 +86,9 @@ export function ChatScreen() {
             {!messages ?
                 <LoadingScreen />
                 :
-                <View flex>
-                    <ListMessages
-                        messages={messages}
-                    />
+                <View style={{ flex: 1 }}>
+                    <ListMessages messages={messages} />
+                    <ChatForm chatId={chatId} />
                 </View>
             }
         </>
