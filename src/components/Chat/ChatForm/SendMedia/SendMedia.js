@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { IconButton, AddIcon, Actionsheet } from 'native-base';
-import { GalleryOption } from './options';
+import { GalleryOption, CameraOption } from './options';
 import { useAuth } from '../../../../hooks';
 import { styles } from './SendMedia.styles.js';
 
@@ -26,6 +26,11 @@ export function SendMedia(props) {
                 onClose={onOpenClose}
             >
                 <Actionsheet.Content style={styles.itemsContainer}>
+                    <CameraOption
+                        onClose={onOpenClose}
+                        chatId={chatId}
+                        accessToken={accessToken}
+                    />
                     <GalleryOption
                         onClose={onOpenClose}
                         chatId={chatId}

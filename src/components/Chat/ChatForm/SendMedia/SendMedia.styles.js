@@ -11,6 +11,10 @@ export const styles = new StyleSheet.create({
         color: '#fff',
         fontSize: 18
     },
+    optionStart: {
+        borderTopRightRadius: 20,
+        borderTopLeftRadius: 20
+    },
     optionEnd: {
         borderBottomRightRadius: 20,
         borderBottomLeftRadius: 20
